@@ -1,0 +1,30 @@
+from pyrogram import idle
+
+import DRGLIB
+from ahmedyad.Keyboards import start_key
+from ahmedyad.Redis import db
+from ahmedyad.get_info import sudo_info, get_bot
+from ahmedyad.yad import Bot, sudo_client
+import logging
+logging.getLogger("pyrogram").setLevel(logging.CRITICAL)
+
+async def main():
+    await Bot.start()
+    if db.get(f'{Bot.me.id}:restart'):
+        await Bot.send_message(sudo_info.username, '⌯ يمكنك استخدام البوت الان', reply_markup=start_key)
+        db.delete(f'{Bot.me.id}:restart')
+    if db.get(f'{get_bot.id}:{sudo_info.id}:session'):
+        try:
+            await sudo_client.start()
+            sudo_client.login = True
+        except Exception as e:
+            print(e)
+            db.delete(f'{get_bot.id}:{sudo_info.id}:session')
+    print("تم تشغيل البوت بنجاح")
+    await idle()
+    await Bot.stop()
+    print("تم ايقاف البوت بنجاح")
+
+
+if __name__ == '__main__':
+    DRGLIB.client.loop.run_until_complete(main())
